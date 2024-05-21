@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   create(createUserDto: CreateUserDto) {
-    this.prismaService.$transaction(async (trnsClient) => {
+    return this.prismaService.$transaction(async (trnsClient) => {
       // create user account
       const account = await trnsClient.account.create({
         data: {
