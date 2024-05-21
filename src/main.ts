@@ -3,12 +3,14 @@ import { AppModule } from './app.module';
 import { LoggerFactory } from './utils/LoggerFactory';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { loggers } from 'winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: LoggerFactory('LibrarySystem'),
   });
+
+  const PORT = process.env.PORT || 3000;
+  const HOST = process.env.HOST || '127.0.0.1';
 
   // Swagger setup
   const config = new DocumentBuilder()
@@ -20,7 +22,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(PORT, HOST);
 
   Logger.log(`Application is running on: ${await app.getUrl()} 🚀`);
   Logger.log(`Swagger is running on: ${await app.getUrl()}/docs 📚`);
