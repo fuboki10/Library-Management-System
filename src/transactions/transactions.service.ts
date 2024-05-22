@@ -27,6 +27,8 @@ export class TransactionsService {
       await this.usersService.isAvailable(userId, trnsClient as any);
       // check if the user has borrowed the book
       await this.isAvailableToBorrow(bookId, userId, trnsClient as any);
+      // decrease book quantity by one
+      await this.booksService.decreaseQuantityByOne(bookId, trnsClient as any);
       // create a borrow transaction
       return await trnsClient.borrowingTransaction.create({
         data: {

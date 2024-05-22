@@ -111,4 +111,21 @@ export class BooksService {
 
     return true;
   }
+
+  /**
+   * Decreases the quantity of a book by 1.
+   * @param id - The ID of the book to decrease the quantity of.
+   * @param prisma - The Prisma client instance.
+   * @returns A promise that resolves to the updated book object.
+   */
+  decreaseQuantityByOne(id: number, prisma: PrismaClient) {
+    return prisma.book.update({
+      where: { id },
+      data: {
+        availableQuantity: {
+          decrement: 1,
+        },
+      },
+    });
+  }
 }
