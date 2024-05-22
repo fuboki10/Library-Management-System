@@ -1,5 +1,11 @@
 import { Prisma } from '@prisma/client';
 
+/**
+ * Maps a DTO object to a Prisma startsWith search query.
+ * @param dto - The DTO object containing the search parameters.
+ * @param mode - The Prisma query mode.
+ * @returns The mapped startsWith search query.
+ */
 export function mapDtoToStartsWithSearchQuery<Type>(
   dto: unknown,
   mode?: Prisma.QueryMode,

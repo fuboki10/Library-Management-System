@@ -38,6 +38,9 @@ export class BooksService {
       'insensitive',
     );
 
+    // override the startsWith search for ISBN, to use an exact match for the hash index
+    where.ISBN = searchBookQuery.ISBN;
+
     return this.prismaService.book.findMany({
       where,
     });

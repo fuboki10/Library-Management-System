@@ -42,4 +42,8 @@ model Book {
   shelfLocation     String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  @@index([ISBN], type: Hash)
+  @@index([title], type: BTree)
+  @@index([author], type: BTree)
 }
