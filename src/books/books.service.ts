@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateBookDto, SearchBookDto, UpdateBookDto } from './dto';
+import { Prisma } from '@prisma/client';
+import { mapDtoToStartsWithSearchQuery } from '../prisma/utils/query';
 
 @Injectable()
 export class BooksService {
@@ -26,8 +27,20 @@ export class BooksService {
    * Retrieves all books.
    * @returns A promise that resolves to an array of books.
    */
-  findAll() {
-    return this.prismaService.book.findMany();
+  /**
+   * Retrieves a list of books based on the provided search criteria.
+   * @param searchBookQuery - The search criteria for filtering the books.
+   * @returns A Promise that resolves to an array of books matching the search criteria.
+   */
+  findAll(searchBookQuery: SearchBookDto) {
+    const where = mapDtoToStartsWithSearchQuery<Prisma.BookWhereInput>(
+      searchBookQuery,
+      'insensitive',
+    );
+
+    return this.prismaService.book.findMany({
+      where,
+    });
   }
 
   /**

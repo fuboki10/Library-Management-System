@@ -9,12 +9,14 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { BookDto } from './dto/book.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SearchBookDto } from './dto/search-book.dto';
 
 @ApiTags('books')
 @Controller({
@@ -33,8 +35,8 @@ export class BooksController {
 
   @Get()
   @ApiResponse({ status: HttpStatus.OK, type: BookDto, isArray: true })
-  findAll() {
-    return this.booksService.findAll();
+  findAll(@Query() searchBookQuery: SearchBookDto) {
+    return this.booksService.findAll(searchBookQuery);
   }
 
   @Get(':id')
