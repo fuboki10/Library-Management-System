@@ -24,26 +24,41 @@ model Account {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  account   Account  @relation(fields: [accountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  accountId Int      @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  email                String                 @unique
+  account              Account                @relation(fields: [accountId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  accountId            Int                    @unique
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  BorrowingTransaction BorrowingTransaction[]
 }
 
 model Book {
-  id                Int      @id @default(autoincrement())
-  title             String
-  author            String
-  ISBN              String
-  availableQuantity Int
-  shelfLocation     String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                   Int                    @id @default(autoincrement())
+  title                String
+  author               String
+  ISBN                 String
+  availableQuantity    Int
+  shelfLocation        String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  BorrowingTransaction BorrowingTransaction[]
 
   @@index([ISBN], type: Hash)
   @@index([title], type: BTree)
   @@index([author], type: BTree)
+}
+
+model BorrowingTransaction {
+  book       Book      @relation(fields: [bookId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  bookId     Int
+  user       User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId     Int
+  returnedAt DateTime?
+  dueDate    DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@id([userId, bookId])
 }
