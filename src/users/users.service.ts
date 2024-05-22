@@ -9,6 +9,11 @@ export class UsersService {
 
   constructor(private readonly prismaService: PrismaService) {}
 
+  /**
+   * Creates a new user.
+   * @param createUserDto - The data for creating a new user.
+   * @returns The created user.
+   */
   create(createUserDto: CreateUserDto) {
     return this.prismaService.$transaction(async (trnsClient) => {
       // create user account
@@ -35,10 +40,21 @@ export class UsersService {
     });
   }
 
+  /**
+   * Retrieves all users.
+   * @returns An array of users.
+   */
   findAll() {
-    return this.prismaService.user.findMany();
+    return this.prismaService.user.findMany({
+      where: {},
+    });
   }
 
+  /**
+   * Retrieves a user by ID.
+   * @param id - The ID of the user.
+   * @returns The user with the specified ID.
+   */
   findOne(id: number) {
     return this.prismaService.user.findUnique({
       where: {
@@ -47,10 +63,26 @@ export class UsersService {
     });
   }
 
+  /**
+   * Updates a user.
+   * @param id - The ID of the user to update.
+   * @param updateUserDto - The data for updating the user.
+   * @returns The updated User
+   */
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: updateUserDto,
+    });
   }
 
+  /**
+   * Removes a user.
+   * @param id - The ID of the user to remove.
+   * @returns The deleted User.
+   */
   remove(id: number) {
     return this.prismaService.user.delete({
       where: {

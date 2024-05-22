@@ -1,12 +1,27 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggerFactory } from './utils/LoggerFactory';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { QueryFailedExceptionFilter } from './prisma/prisma.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: LoggerFactory('LibrarySystem'),
+  });
+
+  app.enableCors({ origin: true, credentials: true });
+  const globalPrefix = 'api';
+
+  /** Set Global filters */
+  app.useGlobalFilters(new QueryFailedExceptionFilter());
+
+  /** Set prefices for app url */
+  app.setGlobalPrefix(globalPrefix);
+
+  /** Add Versioning for the app */
+  app.enableVersioning({
+    type: VersioningType.URI,
   });
 
   app.useGlobalPipes(

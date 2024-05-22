@@ -15,11 +15,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserDto } from './dto/user.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
-@Controller('users')
+@Controller({
+  path: 'users',
+  version: '1',
+})
 @UseGuards(AuthGuard('basic'))
+@ApiBasicAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
