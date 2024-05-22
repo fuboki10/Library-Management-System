@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDate, IsInt, IsOptional } from 'class-validator';
+import { IsAfter } from '../../utils/dtos';
 
 export class BorrowTransactionDto {
   @ApiProperty({
@@ -38,10 +39,11 @@ export class BorrowTransactionDto {
     description: 'The date the book is returned',
     required: false,
   })
+  @IsAfter('borrowedAt')
   @IsDate()
   @Type(() => Date)
   @IsOptional()
-  returnDate?: Date;
+  returnedAt?: Date;
 
   @ApiProperty({
     type: Date,
@@ -49,12 +51,13 @@ export class BorrowTransactionDto {
     default: '2024-05-22',
     required: true,
   })
+  @IsAfter('borrowedAt')
   @IsDate()
   @Type(() => Date)
   dueDate: Date;
 }
 
 export class CreateBorrowTransactionDto extends OmitType(BorrowTransactionDto, [
-  'returnDate',
+  'returnedAt',
   'bookId',
 ] as const) {}
