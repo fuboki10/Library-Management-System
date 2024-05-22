@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { hashPassword } from '../utils/security';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
       const account = await trnsClient.account.create({
         data: {
           username: createUserDto.username,
-          password: createUserDto.password,
+          password: await hashPassword(createUserDto.password),
         },
       });
 

@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -42,19 +43,48 @@ export class UsersController {
 
   @Get(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return this.returnUserOrThrow(
+      (await this.usersService.findOne(+id)) as unknown as UserDto,
+      id,
+    );
   }
 
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.returnUserOrThrow(
+      (await this.usersService.update(
+        +id,
+        updateUserDto,
+      )) as unknown as UserDto,
+      id,
+    );
   }
 
   @Delete(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.returnUserOrThrow(
+      (await this.usersService.remove(+id)) as unknown as UserDto,
+      id,
+    );
+  }
+
+  // ****** Helper functions ****** //
+
+  /**
+   * Returns the user if it exists, otherwise throws a NotFoundException.
+   *
+   * @param user - The user to be returned.
+   * @param id - The ID of the user.
+   * @returns The user if it exists.
+   * @throws NotFoundException if the user does not exist.
+   */
+  private returnUserOrThrow(user: UserDto | null, id: string) {
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 }

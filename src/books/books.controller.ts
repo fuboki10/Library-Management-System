@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -38,19 +39,39 @@ export class BooksController {
 
   @Get(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  findOne(@Param('id') id: string) {
-    return this.booksService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return this.returnBookOrThrow(await this.booksService.findOne(+id), id);
   }
 
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(+id, updateBookDto);
+  async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+    return this.returnBookOrThrow(
+      await this.booksService.update(+id, updateBookDto),
+      id,
+    );
   }
 
   @Delete(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  remove(@Param('id') id: string) {
-    return this.booksService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.returnBookOrThrow(await this.booksService.remove(+id), id);
+  }
+
+  // ****** Helper functions ****** //
+
+  /**
+   * Returns the book if it exists, otherwise throws a NotFoundException.
+   *
+   * @param book - The book to be returned.
+   * @param id - The ID of the book.
+   * @returns The book if it exists.
+   * @throws NotFoundException if the book does not exist.
+   */
+  private returnBookOrThrow(book: BookDto | null, id: string) {
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
+    }
+    return book;
   }
 }
