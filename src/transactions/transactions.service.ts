@@ -15,6 +15,49 @@ export class TransactionsService {
     private readonly usersService: UsersService,
   ) {}
 
+  findAll() {
+    return this.prismaService.borrowingTransaction.findMany();
+  }
+
+  findOne(id: number) {
+    return this.prismaService.borrowingTransaction.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  /**
+   * Retrieves a list of borrowed books.
+   * @returns A promise that resolves to an array of borrowed books with additional transaction details.
+   */
+  async findBorrowedBooks() {
+    const transactions = await this.prismaService.borrowingTransaction.findMany(
+      {
+        where: {
+          returnedAt: null,
+        },
+      },
+    );
+
+    return this.getTransactionBooks(transactions);
+  }
+
+  async findOverdueBooks() {
+    const transactions = await this.prismaService.borrowingTransaction.findMany(
+      {
+        where: {
+          returnedAt: null,
+          dueDate: {
+            lt: new Date(),
+          },
+        },
+      },
+    );
+
+    return this.getTransactionBooks(transactions);
+  }
+
   /**
    * Borrow a book for a user.
    *
@@ -148,5 +191,21 @@ export class TransactionsService {
         returnedAt: null,
       },
     });
+  }
+
+  // ****** Helper functions ****** //
+
+  private getTransactionBooks(transactions: any[]) {
+    return Promise.all(
+      transactions.map(async (transaction) => {
+        const book = await this.booksService.findOne(transaction.bookId);
+        return {
+          ...book,
+          borrowerId: transaction.userId,
+          borrowedAt: transaction.borrowedAt,
+          dueDate: transaction.dueDate,
+        };
+      }),
+    );
   }
 }

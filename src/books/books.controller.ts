@@ -18,6 +18,9 @@ import { BookDto } from './dto/book.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SearchBookDto } from './dto/search-book.dto';
 import { FindByIdParamsDto } from '../utils/dtos';
+import { TransactionsService } from '../transactions/transactions.service';
+import { CreateBorrowTransactionDto } from '../transactions/dto/borrow-transaction.dto';
+import { BorrowedBookDto } from './dto/borrowed-book.dto';
 
 @ApiTags('books')
 @Controller({
@@ -25,7 +28,10 @@ import { FindByIdParamsDto } from '../utils/dtos';
   version: '1',
 })
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly transactionsService: TransactionsService,
+  ) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -38,6 +44,17 @@ export class BooksController {
   @ApiResponse({ status: HttpStatus.OK, type: BookDto, isArray: true })
   findAll(@Query() searchBookQuery: SearchBookDto) {
     return this.booksService.findAll(searchBookQuery);
+  }
+
+  @Get('borrowed')
+  @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
+  borrowed() {
+    return this.transactionsService.findBorrowedBooks();
+  }
+  @Get('borrowed/overdue')
+  @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
+  overdue() {
+    return this.transactionsService.findOverdueBooks();
   }
 
   @Get(':id')
@@ -62,6 +79,19 @@ export class BooksController {
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
   async remove(@Param() { id }: FindByIdParamsDto) {
     return this.returnBookOrThrow(await this.booksService.remove(id), id);
+  }
+
+  @Post(':id/borrow')
+  borrow(
+    @Param() { id }: FindByIdParamsDto,
+    @Body() borrowTransactionDto: CreateBorrowTransactionDto,
+  ) {
+    return this.transactionsService.borrow(id, 1, borrowTransactionDto);
+  }
+
+  @Post(':id/return')
+  return(@Param() { id }: FindByIdParamsDto) {
+    return this.transactionsService.return(id, 1);
   }
 
   // ****** Helper functions ****** //
