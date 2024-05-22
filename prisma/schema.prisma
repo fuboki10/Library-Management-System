@@ -51,14 +51,16 @@ model Book {
 }
 
 model BorrowingTransaction {
+  id         Int       @id @default(autoincrement())
   book       Book      @relation(fields: [bookId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   bookId     Int
   user       User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId     Int
-  returnedAt DateTime?
-  dueDate    DateTime
+  borrowedAt DateTime  @default(now()) @db.Date
+  returnedAt DateTime? @db.Date
+  dueDate    DateTime  @db.Date
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  @@id([userId, bookId])
+  @@unique([userId, bookId, returnedAt])
 }

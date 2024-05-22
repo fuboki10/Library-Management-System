@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsISBN,
   IsInt,
@@ -44,6 +45,7 @@ export class CreateBookDto {
   })
   @IsInt({ message: 'Quantity must be an integer' })
   @Min(1, { message: 'Quantity must be at least 1' })
+  @Type(() => Number)
   availableQuantity: number;
 
   @ApiProperty({

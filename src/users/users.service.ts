@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword } from '../utils/security';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -90,5 +91,14 @@ export class UsersService {
         id,
       },
     });
+  }
+
+  async isAvailable(id: number, prisma: PrismaClient) {
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User With ID = ${id} is not found`);
+    }
+
+    return true;
   }
 }

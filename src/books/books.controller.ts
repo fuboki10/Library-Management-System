@@ -17,6 +17,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { BookDto } from './dto/book.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SearchBookDto } from './dto/search-book.dto';
+import { FindByIdParamsDto } from '../utils/dtos';
 
 @ApiTags('books')
 @Controller({
@@ -41,23 +42,26 @@ export class BooksController {
 
   @Get(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  async findOne(@Param('id') id: string) {
-    return this.returnBookOrThrow(await this.booksService.findOne(+id), id);
+  async findOne(@Param() { id }: FindByIdParamsDto) {
+    return this.returnBookOrThrow(await this.booksService.findOne(id), id);
   }
 
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+  async update(
+    @Param() { id }: FindByIdParamsDto,
+    @Body() updateBookDto: UpdateBookDto,
+  ) {
     return this.returnBookOrThrow(
-      await this.booksService.update(+id, updateBookDto),
+      await this.booksService.update(id, updateBookDto),
       id,
     );
   }
 
   @Delete(':id')
   @ApiResponse({ status: HttpStatus.OK, type: BookDto })
-  async remove(@Param('id') id: string) {
-    return this.returnBookOrThrow(await this.booksService.remove(+id), id);
+  async remove(@Param() { id }: FindByIdParamsDto) {
+    return this.returnBookOrThrow(await this.booksService.remove(id), id);
   }
 
   // ****** Helper functions ****** //
@@ -70,7 +74,7 @@ export class BooksController {
    * @returns The book if it exists.
    * @throws NotFoundException if the book does not exist.
    */
-  private returnBookOrThrow(book: BookDto | null, id: string) {
+  private returnBookOrThrow(book: BookDto | null, id: number) {
     if (!book) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }

@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 import { LoggerMiddleware } from './utils/logger.middleware';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UsersModule, BooksModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UsersModule, BooksModule, TransactionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

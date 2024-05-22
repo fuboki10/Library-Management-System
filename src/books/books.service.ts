@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto, SearchBookDto, UpdateBookDto } from './dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { mapDtoToStartsWithSearchQuery } from '../prisma/utils/query';
 
 @Injectable()
@@ -85,5 +85,30 @@ export class BooksService {
         id,
       },
     });
+  }
+
+  /**
+   * Checks if a book with the specified ID is available.
+   * @param id - The ID of the book to check.
+   * @param prisma - The Prisma client instance.
+   * @returns A boolean indicating whether the book is available or not.
+   * @throws NotFoundException if the book is not found or not available.
+   */
+  async isAvailable(id: number, prisma: PrismaClient) {
+    const book = await prisma.book.findUnique({
+      where: {
+        id,
+        availableQuantity: {
+          gte: 1,
+        },
+      },
+    });
+    if (!book) {
+      throw new NotFoundException(
+        `Book with ID = ${id} is not found or not available`,
+      );
+    }
+
+    return true;
   }
 }

@@ -1,14 +1,19 @@
 -- CreateTable
 CREATE TABLE "BorrowingTransaction" (
+    "id" SERIAL NOT NULL,
     "bookId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
-    "returnedAt" TIMESTAMP(3),
-    "dueDate" TIMESTAMP(3) NOT NULL,
+    "borrowedAt" DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "returnedAt" DATE,
+    "dueDate" DATE NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "BorrowingTransaction_pkey" PRIMARY KEY ("userId","bookId")
+    CONSTRAINT "BorrowingTransaction_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BorrowingTransaction_userId_bookId_returnedAt_key" ON "BorrowingTransaction"("userId", "bookId", "returnedAt");
 
 -- AddForeignKey
 ALTER TABLE "BorrowingTransaction" ADD CONSTRAINT "BorrowingTransaction_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book"("id") ON DELETE CASCADE ON UPDATE CASCADE;

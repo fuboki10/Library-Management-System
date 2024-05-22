@@ -20,27 +20,34 @@ export class QueryFailedExceptionFilter extends BaseExceptionFilter {
   ): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    try {
+      const errorResponse = {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'Input data validation failed',
+        errors: this.buildError(exception),
+      };
 
-    const errorResponse = {
-      status: HttpStatus.BAD_REQUEST,
-      message: 'Input data validation failed',
-      errors: this.buildError(exception),
-    };
-
-    response.status(HttpStatus.BAD_REQUEST).json(errorResponse);
+      response.status(HttpStatus.BAD_REQUEST).json(errorResponse);
+    } catch (error) {
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal Server Error',
+      });
+    }
   }
 
   private buildError(exception: Prisma.PrismaClientKnownRequestError): any {
     const { meta }: any = exception;
-    const key = meta.target[0];
     const errors = [];
     if (exception.code === 'P2002') {
+      const key = meta.target[0];
       // Unique constraint
       errors.push(`${key} must be unique`);
     } else {
+      this.logger.debug(exception);
       this.logger.error(exception.message);
 
-      errors.push(`${key} Unknown error: ${exception.message}`);
+      throw new Error(exception.message);
     }
 
     return errors;

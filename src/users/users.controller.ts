@@ -17,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserDto } from './dto/user.dto';
 import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FindByIdParamsDto } from '../utils/dtos';
 
 @ApiTags('users')
 @Controller({
@@ -43,30 +44,30 @@ export class UsersController {
 
   @Get(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param() { id }: FindByIdParamsDto) {
     return this.returnUserOrThrow(
-      (await this.usersService.findOne(+id)) as unknown as UserDto,
+      (await this.usersService.findOne(id)) as unknown as UserDto,
       id,
     );
   }
 
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param() { id }: FindByIdParamsDto,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.returnUserOrThrow(
-      (await this.usersService.update(
-        +id,
-        updateUserDto,
-      )) as unknown as UserDto,
+      (await this.usersService.update(id, updateUserDto)) as unknown as UserDto,
       id,
     );
   }
 
   @Delete(':id')
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
-  async remove(@Param('id') id: string) {
+  async remove(@Param() { id }: FindByIdParamsDto) {
     return this.returnUserOrThrow(
-      (await this.usersService.remove(+id)) as unknown as UserDto,
+      (await this.usersService.remove(id)) as unknown as UserDto,
       id,
     );
   }
@@ -81,7 +82,7 @@ export class UsersController {
    * @returns The user if it exists.
    * @throws NotFoundException if the user does not exist.
    */
-  private returnUserOrThrow(user: UserDto | null, id: string) {
+  private returnUserOrThrow(user: UserDto | null, id: number) {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
