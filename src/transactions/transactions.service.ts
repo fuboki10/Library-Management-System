@@ -15,6 +15,15 @@ export class TransactionsService {
     private readonly usersService: UsersService,
   ) {}
 
+  /**
+   * Borrow a book for a user.
+   *
+   * @param bookId - The ID of the book to be borrowed.
+   * @param userId - The ID of the user borrowing the book.
+   * @param borrowTransactionDto - The borrow transaction data.
+   * @returns The created borrow transaction.
+   * @throws BadRequestException if the user has already borrowed the book.
+   */
   borrow(
     bookId: number,
     userId: number,
@@ -23,7 +32,7 @@ export class TransactionsService {
     return this.prismaService.$transaction(async (trnsClient) => {
       // check if the book is available
       await this.booksService.isAvailable(bookId, trnsClient as any);
-      // check is the user exists
+      // check if the user exists
       await this.usersService.isAvailable(userId, trnsClient as any);
       // check if the user has borrowed the book
       await this.isAvailableToBorrow(bookId, userId, trnsClient as any);
@@ -40,25 +49,104 @@ export class TransactionsService {
     });
   }
 
+  return(bookId: number, userId: number) {
+    return this.prismaService.$transaction(async (trnsClient) => {
+      // check if the user has borrowed the book
+      const existingTransaction = await this.isAvailableToReturn(
+        bookId,
+        userId,
+        trnsClient as any,
+      );
+      // increase book quantity by one
+      await this.booksService.increaseQuantityByOne(bookId, trnsClient as any);
+      // update the borrow transaction
+      return await trnsClient.borrowingTransaction.update({
+        where: {
+          id: existingTransaction.id,
+        },
+        data: {
+          returnedAt: new Date(),
+        },
+      });
+    });
+  }
+
+  /**
+   * Check if a book is available to be borrowed by a user.
+   *
+   * @param bookId - The ID of the book.
+   * @param userId - The ID of the user.
+   * @param prisma - The Prisma client instance.
+   * @returns The existing transaction if the book is borrowed by the user, otherwise throws a BadRequestException.
+   * @throws BadRequestException if the user has already borrowed the book.
+   */
   async isAvailableToBorrow(
     bookId: number,
     userId: number,
     prisma: PrismaClient,
   ) {
-    const existingTransaction = await prisma.borrowingTransaction.findFirst({
-      where: {
-        bookId,
-        userId,
-        returnedAt: null,
-      },
-    });
-    // if yes, throw an error
+    const existingTransaction = await this.findExistingTransaction(
+      bookId,
+      userId,
+      prisma,
+    );
+
     if (existingTransaction) {
       throw new BadRequestException(
         `User with ID = ${userId} has already borrowed the book with ID = ${bookId}`,
       );
     }
 
-    return true;
+    return existingTransaction;
+  }
+
+  /**
+   * Checks if a book is available to be returned by a user.
+   *
+   * @param bookId - The ID of the book.
+   * @param userId - The ID of the user.
+   * @param prisma - The Prisma client instance.
+   * @returns The existing transaction if the book is borrowed by the user, otherwise throws a BadRequestException.
+   */
+  async isAvailableToReturn(
+    bookId: number,
+    userId: number,
+    prisma: PrismaClient,
+  ) {
+    const existingTransaction = await this.findExistingTransaction(
+      bookId,
+      userId,
+      prisma,
+    );
+
+    if (!existingTransaction) {
+      throw new BadRequestException(
+        `User with ID = ${userId} has not borrowed the book with ID = ${bookId}`,
+      );
+    }
+
+    return existingTransaction;
+  }
+
+  /**
+   * Finds an existing borrowing transaction for a given book and user.
+   *
+   * @param bookId - The ID of the book.
+   * @param userId - The ID of the user.
+   * @param prisma - The Prisma client instance.
+   * @returns A Promise that resolves to the first borrowing transaction that matches the given book and user, and has not been returned yet.
+   */
+  findExistingTransaction(
+    bookId: number,
+    userId: number,
+    prisma: PrismaClient,
+  ) {
+    return prisma.borrowingTransaction.findFirst({
+      where: {
+        bookId,
+        userId,
+        returnedAt: null,
+      },
+    });
   }
 }

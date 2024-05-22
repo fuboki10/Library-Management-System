@@ -19,4 +19,9 @@ export class TransactionsController {
   ) {
     return this.transactionsService.borrow(id, 1, borrowTransactionDto);
   }
+
+  @Post('return')
+  return(@Param() { id }: FindByIdParamsDto) {
+    return this.transactionsService.return(id, 1);
+  }
 }
