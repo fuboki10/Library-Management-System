@@ -1,23 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsDate,
   IsInt,
+  IsOptional,
   ValidateBy,
   ValidationArguments,
   ValidationOptions,
   buildMessage,
 } from 'class-validator';
-
-export class FindByIdParamsDto {
-  @ApiProperty({
-    name: 'id',
-    type: Number,
-    required: true,
-  })
-  @IsInt()
-  @Type(() => Number)
-  id: number;
-}
 
 // **************** Decorators **************** //
 
@@ -52,3 +43,44 @@ export const IsAfter = (
     },
     options,
   );
+
+// **************** DTO **************** //
+
+export class FindByIdParamsDto {
+  @ApiProperty({
+    name: 'id',
+    type: Number,
+    required: true,
+  })
+  @IsInt()
+  @Type(() => Number)
+  id: number;
+}
+
+export interface IRangedDate {
+  from?: Date;
+  to?: Date;
+}
+
+export class RangeDateQueryDto implements IRangedDate {
+  @ApiProperty({
+    name: 'from',
+    type: Date,
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  from: Date;
+
+  @ApiProperty({
+    name: 'to',
+    type: Date,
+    required: false,
+  })
+  @IsAfter('from')
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  to: Date;
+}

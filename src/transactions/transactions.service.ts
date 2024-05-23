@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { BooksService } from '../books/books.service';
 import { UsersService } from '../users/users.service';
 import { PrismaClient } from '@prisma/client';
+import { IRangedDate } from '../utils/dtos';
 
 @Injectable()
 export class TransactionsService {
@@ -28,14 +29,21 @@ export class TransactionsService {
   }
 
   /**
-   * Retrieves a list of borrowed books.
-   * @returns A promise that resolves to an array of borrowed books with additional transaction details.
+   * Finds the borrowed books within a specified date range.
+   * If no date range is provided, it returns all the currently borrowed books.
+   *
+   * @param rangeDate - Optional date range to filter the borrowed books.
+   * @returns A Promise that resolves to an array of borrowed books.
    */
-  async findBorrowedBooks() {
+  async findBorrowedBooks(rangeDate?: IRangedDate) {
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
           returnedAt: null,
+          borrowedAt: {
+            gte: rangeDate?.from,
+            lte: rangeDate?.to,
+          },
         },
       },
     );
@@ -44,17 +52,21 @@ export class TransactionsService {
   }
 
   /**
-   * Finds the borrowed books by a user.
-   *
+   * Finds the borrowed books by a user within a specified date range.
    * @param userId - The ID of the user.
+   * @param rangeDate - Optional date range to filter the borrowed books.
    * @returns A Promise that resolves to an array of borrowed books.
    */
-  async findBorrowedBooksByUser(userId: number) {
+  async findBorrowedBooksByUser(userId: number, rangeDate?: IRangedDate) {
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
           userId,
           returnedAt: null,
+          borrowedAt: {
+            gte: rangeDate?.from,
+            lte: rangeDate?.to,
+          },
         },
       },
     );
@@ -62,13 +74,24 @@ export class TransactionsService {
     return this.getTransactionBooks(transactions);
   }
 
-  async findOverdueBooks() {
+  /**
+   * Finds overdue books based on the given date range.
+   * If no date range is provided, it returns all overdue books.
+   *
+   * @param rangeDate - Optional date range to filter the overdue books.
+   * @returns A Promise that resolves to an array of books that are overdue.
+   */
+  async findOverdueBooks(rangeDate?: IRangedDate) {
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
           returnedAt: null,
           dueDate: {
             lt: new Date(),
+          },
+          borrowedAt: {
+            gte: rangeDate?.from,
+            lte: rangeDate?.to,
           },
         },
       },

@@ -18,7 +18,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { BookDto } from './dto/book.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SearchBookDto } from './dto/search-book.dto';
-import { FindByIdParamsDto } from '../utils/dtos';
+import { FindByIdParamsDto, RangeDateQueryDto } from '../utils/dtos';
 import { TransactionsService } from '../transactions/transactions.service';
 import { CreateBorrowTransactionDto } from '../transactions/dto/borrow-transaction.dto';
 import { BorrowedBookDto } from './dto/borrowed-book.dto';
@@ -51,13 +51,13 @@ export class BooksController {
 
   @Get('borrowed')
   @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
-  borrowed() {
-    return this.transactionsService.findBorrowedBooks();
+  borrowed(@Query() rangeDate: RangeDateQueryDto) {
+    return this.transactionsService.findBorrowedBooks(rangeDate);
   }
   @Get('borrowed/overdue')
   @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
-  overdue() {
-    return this.transactionsService.findOverdueBooks();
+  overdue(@Query() rangeDate: RangeDateQueryDto) {
+    return this.transactionsService.findOverdueBooks(rangeDate);
   }
 
   @Get(':id')

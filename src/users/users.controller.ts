@@ -10,13 +10,14 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FindByIdParamsDto } from '../utils/dtos';
+import { FindByIdParamsDto, RangeDateQueryDto } from '../utils/dtos';
 import { TransactionsService } from '../transactions/transactions.service';
 import { BorrowedBookDto } from '../books/dto/borrowed-book.dto';
 import { BasicAuthGuard } from '../auth/auth-basic.guard';
@@ -84,8 +85,11 @@ export class UsersController {
 
   @Get(':id/books/borrowed')
   @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
-  async getBorrowedBooks(@Param() { id }: FindByIdParamsDto) {
-    return this.transactionsService.findBorrowedBooksByUser(id);
+  async getBorrowedBooks(
+    @Param() { id }: FindByIdParamsDto,
+    @Query() rangeDate: RangeDateQueryDto,
+  ) {
+    return this.transactionsService.findBorrowedBooksByUser(id, rangeDate);
   }
 
   // ****** Helper functions ****** //
