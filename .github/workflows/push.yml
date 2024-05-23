@@ -98,12 +98,12 @@ jobs:
             ${{ runner.os }}-nodemodules-
           required: true
 
+      - name: Run postgresql with docker
+        run: docker compose -f docker-compose.yml up postgres -d --wait
+
       - name: List the state of node modules
         continue-on-error: true
         run: npm list -g --depth=0
-
-      - name: Run postgresql with docker
-        run: docker compose -f docker-compose.yml up postgres -d --wait
 
       - name: Migrate Database
         run: npx prisma migrate deploy && npx prisma generate
