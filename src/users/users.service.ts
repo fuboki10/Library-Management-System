@@ -101,4 +101,12 @@ export class UsersService {
 
     return true;
   }
+
+  findByUsername(username: string) {
+    return this.prismaService.account.findFirst({
+      where: {
+        username,
+      },
+    });
+  }
 }

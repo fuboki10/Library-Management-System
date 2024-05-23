@@ -176,7 +176,7 @@ export class BooksController {
     @Param() { id }: FindByIdParamsDto,
     @Body() borrowTransactionDto: CreateBorrowTransactionDto,
   ) {
-    return this.transactionsService.borrow(id, 1, borrowTransactionDto);
+    return this.transactionsService.borrow(id, borrowTransactionDto);
   }
 
   @Post(':id/return')

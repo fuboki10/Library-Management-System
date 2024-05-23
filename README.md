@@ -32,6 +32,8 @@ borrowers in Nestjs
 <br>
 <a href="https://library-management-system-blond.vercel.app/docs">API Swagger</a>
 
+*Default Super Admin Credentials (username: **admin**, password: **admin**)*
+
 ## Built With
 - [Node.js](https://nodejs.org)
 - [TypeScript](https://www.typescriptlang.org)

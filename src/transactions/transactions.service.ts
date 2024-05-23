@@ -104,16 +104,12 @@ export class TransactionsService {
    * Borrow a book for a user.
    *
    * @param bookId - The ID of the book to be borrowed.
-   * @param userId - The ID of the user borrowing the book.
    * @param borrowTransactionDto - The borrow transaction data.
    * @returns The created borrow transaction.
    * @throws BadRequestException if the user has already borrowed the book.
    */
-  borrow(
-    bookId: number,
-    userId: number,
-    borrowTransactionDto: CreateBorrowTransactionDto,
-  ) {
+  borrow(bookId: number, borrowTransactionDto: CreateBorrowTransactionDto) {
+    const userId = borrowTransactionDto.userId;
     return this.prismaService.$transaction(async (trnsClient) => {
       // check if the book is available
       await this.booksService.isAvailable(bookId, trnsClient as any);
@@ -128,7 +124,6 @@ export class TransactionsService {
         data: {
           ...borrowTransactionDto,
           bookId,
-          userId,
         },
       });
     });
