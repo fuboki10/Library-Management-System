@@ -18,6 +18,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserDto } from './dto/user.dto';
 import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindByIdParamsDto } from '../utils/dtos';
+import { TransactionsService } from '../transactions/transactions.service';
+import { BorrowedBookDto } from '../books/dto/borrowed-book.dto';
 
 @ApiTags('users')
 @Controller({
@@ -27,7 +29,10 @@ import { FindByIdParamsDto } from '../utils/dtos';
 @UseGuards(AuthGuard('basic'))
 @ApiBasicAuth()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly transactionsService: TransactionsService,
+  ) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -70,6 +75,12 @@ export class UsersController {
       (await this.usersService.remove(id)) as unknown as UserDto,
       id,
     );
+  }
+
+  @Get(':id/books/borrowed')
+  @ApiResponse({ status: HttpStatus.OK, type: BorrowedBookDto, isArray: true })
+  async getBorrowedBooks(@Param() { id }: FindByIdParamsDto) {
+    return this.transactionsService.findBorrowedBooksByUser(id);
   }
 
   // ****** Helper functions ****** //

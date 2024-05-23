@@ -43,6 +43,25 @@ export class TransactionsService {
     return this.getTransactionBooks(transactions);
   }
 
+  /**
+   * Finds the borrowed books by a user.
+   *
+   * @param userId - The ID of the user.
+   * @returns A Promise that resolves to an array of borrowed books.
+   */
+  async findBorrowedBooksByUser(userId: number) {
+    const transactions = await this.prismaService.borrowingTransaction.findMany(
+      {
+        where: {
+          userId,
+          returnedAt: null,
+        },
+      },
+    );
+
+    return this.getTransactionBooks(transactions);
+  }
+
   async findOverdueBooks() {
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
