@@ -22,7 +22,8 @@ import { TransactionsService } from '../transactions/transactions.service';
 import { BorrowedBookDto } from '../books/dto/borrowed-book.dto';
 import { BasicAuthGuard } from '../auth/auth-basic.guard';
 import { RoleGuard, Roles } from '../auth/role.guard';
-import { RolesEnum } from 'src/auth/roles';
+import { RolesEnum } from '../auth/roles';
+import { convertSinceToDate } from '../utils/time';
 
 @ApiTags('users')
 @Controller({
@@ -89,6 +90,10 @@ export class UsersController {
     @Param() { id }: FindByIdParamsDto,
     @Query() rangeDate: RangeDateQueryDto,
   ) {
+    if (rangeDate?.since) {
+      rangeDate.from = convertSinceToDate(rangeDate.since);
+    }
+
     return this.transactionsService.findBorrowedBooksByUser(id, rangeDate);
   }
 

@@ -5,7 +5,6 @@ import { BooksService } from '../books/books.service';
 import { UsersService } from '../users/users.service';
 import { PrismaClient } from '@prisma/client';
 import { IRangedDate } from '../utils/dtos';
-import { convertSinceToDate } from 'src/utils/time';
 
 @Injectable()
 export class TransactionsService {
@@ -37,10 +36,6 @@ export class TransactionsService {
    * @returns A Promise that resolves to an array of borrowed books.
    */
   async findBorrowedBooks(rangeDate?: IRangedDate) {
-    if (rangeDate?.since) {
-      rangeDate.from = convertSinceToDate(rangeDate.since);
-    }
-
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
@@ -63,10 +58,6 @@ export class TransactionsService {
    * @returns A Promise that resolves to an array of borrowed books.
    */
   async findBorrowedBooksByUser(userId: number, rangeDate?: IRangedDate) {
-    if (rangeDate?.since) {
-      rangeDate.from = convertSinceToDate(rangeDate.since);
-    }
-
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
@@ -91,10 +82,6 @@ export class TransactionsService {
    * @returns A Promise that resolves to an array of books that are overdue.
    */
   async findOverdueBooks(rangeDate?: IRangedDate) {
-    if (rangeDate?.since) {
-      rangeDate.from = convertSinceToDate(rangeDate.since);
-    }
-
     const transactions = await this.prismaService.borrowingTransaction.findMany(
       {
         where: {
