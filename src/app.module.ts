@@ -8,6 +8,7 @@ import { BooksModule } from './books/books.module';
 import { LoggerMiddleware } from './utils/logger.middleware';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         limit: 10,
       },
     ]),
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
