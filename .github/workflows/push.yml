@@ -4,6 +4,9 @@ on:
     branches:
       - main
 
+env:
+  DATABASE_URL: postgresql://postgres:password@127.0.0.1:5432/library
+
 jobs:
   install:
     name: Install Dependencies
@@ -98,6 +101,12 @@ jobs:
       - name: List the state of node modules
         continue-on-error: true
         run: npm list -g --depth=0
+
+      - name: Run postgresql with docker
+        run: docker compose -f docker-compose.yml up postgres -d --wait
+
+      - name: Migrate Database
+        run: npx prisma migrate deploy && npx prisma generate
 
       - name: Test
         run: npm run test
