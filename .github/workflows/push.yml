@@ -1,0 +1,106 @@
+name: Commit
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check node_modules
+        id: cache-node-modules
+        uses: martijnhols/actions-cache/check@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install project dependencies
+        run: npm ci
+        if: |
+          steps.cache-node-modules.outputs.cache-hit != 'true'
+
+      - name: Save node_modules
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        uses: martijnhols/actions-cache/save@v3
+        with:
+          path: node_modules
+          key: ${{ steps.cache-node-modules.outputs.primary-key }}
+
+  build:
+    needs: [install]
+    name: Build and Lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore node_modules
+        id: cache-node-modules
+        uses: martijnhols/actions-cache/restore@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nodemodules-
+          required: true
+
+      - name: List the state of node modules
+        continue-on-error: true
+        run: npm list -g --depth=0
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+  test:
+    needs: [install]
+    name: Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore node_modules
+        id: cache-node-modules
+        uses: martijnhols/actions-cache/restore@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nodemodules-
+          required: true
+
+      - name: List the state of node modules
+        continue-on-error: true
+        run: npm list -g --depth=0
+
+      - name: Test
+        run: npm run test
+
+      - name: E2E Test
+        run: npm run test:e2e
