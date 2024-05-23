@@ -10,6 +10,7 @@ import {
   HttpStatus,
   NotFoundException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -21,12 +22,14 @@ import { FindByIdParamsDto } from '../utils/dtos';
 import { TransactionsService } from '../transactions/transactions.service';
 import { CreateBorrowTransactionDto } from '../transactions/dto/borrow-transaction.dto';
 import { BorrowedBookDto } from './dto/borrowed-book.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('books')
 @Controller({
   path: 'books',
   version: '1',
 })
+@UseGuards(ThrottlerGuard)
 export class BooksController {
   constructor(
     private readonly booksService: BooksService,
