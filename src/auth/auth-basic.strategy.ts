@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
+import { RolesEnum } from './roles';
 
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy) {
@@ -17,14 +18,16 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  public validate = async (req, username, password): Promise<boolean> => {
+  public validate = async (req, username, password): Promise<any> => {
     this.logger.debug('Validating user credentials...');
     try {
       if (
         this.configService.getOrThrow<string>('HTTP_BASIC_USER') === username &&
         this.configService.getOrThrow<string>('HTTP_BASIC_PASS') === password
       ) {
-        return true;
+        return {
+          role: RolesEnum.SUPER_ADMIN,
+        };
       }
       this.logger.debug('Invalid credentials provided.');
       throw new UnauthorizedException();

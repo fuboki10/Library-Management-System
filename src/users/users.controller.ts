@@ -14,19 +14,21 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { UserDto } from './dto/user.dto';
 import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindByIdParamsDto } from '../utils/dtos';
 import { TransactionsService } from '../transactions/transactions.service';
 import { BorrowedBookDto } from '../books/dto/borrowed-book.dto';
+import { BasicAuthGuard } from '../auth/auth-basic.guard';
+import { RoleGuard, Roles } from '../auth/role.guard';
+import { RolesEnum } from 'src/auth/roles';
 
 @ApiTags('users')
 @Controller({
   path: 'users',
   version: '1',
 })
-@UseGuards(AuthGuard('basic'))
+@UseGuards(BasicAuthGuard, RoleGuard)
 @ApiBasicAuth()
 export class UsersController {
   constructor(
@@ -36,6 +38,7 @@ export class UsersController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
+  @Roles(RolesEnum.Admin, RolesEnum.SUPER_ADMIN) // Only users with the 'admin' role can create users.
   @ApiResponse({ status: HttpStatus.CREATED, type: UserDto })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -57,6 +60,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @Roles(RolesEnum.Admin, RolesEnum.SUPER_ADMIN) // Only users with the 'admin' role can update users.
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
   async update(
     @Param() { id }: FindByIdParamsDto,
@@ -69,6 +73,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles(RolesEnum.Admin, RolesEnum.SUPER_ADMIN) // Only users with the 'admin' role can delete users.
   @ApiResponse({ status: HttpStatus.OK, type: UserDto })
   async remove(@Param() { id }: FindByIdParamsDto) {
     return this.returnUserOrThrow(
