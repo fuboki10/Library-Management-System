@@ -41,7 +41,16 @@ async function bootstrap() {
     })
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    customCss:
+      '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }',
+    customCssUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js',
+    ],
+  });
 
   const PORT = process.env.PORT || 3000;
   const HOST = process.env.HOST || '127.0.0.1';
