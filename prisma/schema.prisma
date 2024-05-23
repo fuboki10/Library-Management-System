@@ -63,4 +63,6 @@ model BorrowingTransaction {
   updatedAt  DateTime  @updatedAt
 
   @@unique([userId, bookId, returnedAt])
+  @@index([borrowedAt], type: BTree)
+  @@index([dueDate], type: BTree)
 }
