@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDate,
+  IsEnum,
   IsInt,
   IsOptional,
   ValidateBy,
@@ -32,11 +33,41 @@ export const IsAfter = (
           const relatedValue = (args.object as Record<string, unknown>)[
             relatedPropertyName
           ] as Date;
-          return value.toISOString() > relatedValue.toISOString();
+          return (
+            value === undefined ||
+            relatedValue === undefined ||
+            value.toISOString() > relatedValue.toISOString()
+          );
         },
         defaultMessage: buildMessage(
           (each: string): string =>
             each + '$property must be after $constraint1',
+          options,
+        ),
+      },
+    },
+    options,
+  );
+
+export const IsNotExistWith = (
+  property: string,
+  options?: ValidationOptions,
+): PropertyDecorator =>
+  ValidateBy(
+    {
+      name: 'IsNotExistWith',
+      constraints: [property],
+      validator: {
+        validate: (value: string, args: ValidationArguments): boolean => {
+          const [relatedPropertyName] = args.constraints;
+          const relatedValue = (args.object as Record<string, unknown>)[
+            relatedPropertyName
+          ] as string;
+          return value !== undefined && relatedValue === undefined;
+        },
+        defaultMessage: buildMessage(
+          (each: string): string =>
+            each + '$property must not be set with $constraint1',
           options,
         ),
       },
@@ -60,6 +91,7 @@ export class FindByIdParamsDto {
 export interface IRangedDate {
   from?: Date;
   to?: Date;
+  since?: string;
 }
 
 export class RangeDateQueryDto implements IRangedDate {
@@ -83,4 +115,15 @@ export class RangeDateQueryDto implements IRangedDate {
   @Type(() => Date)
   @IsOptional()
   to: Date;
+
+  @ApiProperty({
+    name: 'since',
+    type: String,
+    required: false,
+    enum: ['yesterday', 'lastweek', 'lastmonth', 'lastyear'],
+  })
+  @IsNotExistWith('from')
+  @IsEnum(['yesterday', 'lastweek', 'lastmonth', 'lastyear'])
+  @IsOptional()
+  since: string;
 }
