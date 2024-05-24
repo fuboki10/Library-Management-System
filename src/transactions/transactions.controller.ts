@@ -4,11 +4,13 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Query,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FindByIdParamsDto } from '../utils/dtos';
+import { FindByIdParamsDto, RangeDateQueryDto } from '../utils/dtos';
 import { BorrowTransactionDto } from './dto/borrow-transaction.dto';
+import { convertSinceToDate } from '../utils/time';
 
 @ApiTags('transactions')
 @Controller({
@@ -24,8 +26,12 @@ export class TransactionsController {
     type: BorrowTransactionDto,
     isArray: true,
   })
-  findAll() {
-    return this.transactionsService.findAll();
+  findAll(@Query() rangeDate: RangeDateQueryDto) {
+    if (rangeDate?.since) {
+      rangeDate.from = convertSinceToDate(rangeDate.since);
+    }
+
+    return this.transactionsService.findAll(rangeDate);
   }
 
   @Get(':id')

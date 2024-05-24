@@ -1,11 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { IRangedDate } from '../utils/dtos';
+import { TransactionsService } from '../transactions/transactions.service';
+import { BorrowingTransaction } from '@prisma/client';
 
 @Injectable()
 export class AnalyticsService {
   private readonly logger = new Logger(AnalyticsService.name);
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly transactionsService: TransactionsService,
+  ) {}
 
   /**
    * Retrieves the popular books based on the number of borrowings.
@@ -68,5 +74,41 @@ export class AnalyticsService {
       author: author.author,
       borrowCount: parseInt(author.borrow_count),
     }));
+  }
+
+  /**
+   * Retrieves and analyzes transactions within a specified date range.
+   * @param rangeDate - The date range for which to retrieve transactions.
+   * @returns An object containing the analyzed transactions and various counts.
+   */
+  async getTransactionsAnalysis(rangeDate: IRangedDate) {
+    this.logger.debug('Retrieving transactions analysis...');
+    const transactions = await this.transactionsService.findAll(rangeDate);
+    this.logger.debug(
+      `Retrieved transactions analysis. Count: ${transactions.length}`,
+    );
+
+    const extendedTransactions = transactions.map(
+      (
+        transaction,
+      ): BorrowingTransaction & { returned: boolean; overdue: boolean } => {
+        const returned = transaction.returnedAt ? true : false;
+        const overdue = this.transactionsService.isOverdue(transaction);
+
+        return { ...transaction, returned, overdue };
+      },
+    );
+
+    // perform analysis here
+    const returnedCount = extendedTransactions.filter((t) => t.returned).length;
+    const overdueCount = extendedTransactions.filter((t) => t.overdue).length;
+    const borrowedCount = extendedTransactions.length - returnedCount;
+
+    return {
+      transactions: extendedTransactions,
+      returnedCount,
+      overdueCount,
+      borrowedCount,
+    };
   }
 }

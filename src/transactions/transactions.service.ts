@@ -16,8 +16,22 @@ export class TransactionsService {
     private readonly usersService: UsersService,
   ) {}
 
-  findAll() {
-    return this.prismaService.borrowingTransaction.findMany();
+  /**
+   * Retrieves all borrowing transactions within the specified date range.
+   * If no date range is provided, returns all borrowing transactions.
+   *
+   * @param rangeDate - An optional object specifying the date range.
+   * @returns A promise that resolves to an array of borrowing transactions.
+   */
+  findAll(rangeDate?: IRangedDate) {
+    return this.prismaService.borrowingTransaction.findMany({
+      where: {
+        borrowedAt: {
+          gte: rangeDate?.from,
+          lte: rangeDate?.to,
+        },
+      },
+    });
   }
 
   findOne(id: number) {
@@ -228,6 +242,13 @@ export class TransactionsService {
         returnedAt: null,
       },
     });
+  }
+
+  isOverdue(transaction: { dueDate: Date; returnedAt: Date }) {
+    return (
+      new Date() > transaction.dueDate &&
+      (!transaction.returnedAt || transaction.returnedAt > transaction.dueDate)
+    );
   }
 
   // ****** Helper functions ****** //
