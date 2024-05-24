@@ -180,7 +180,10 @@ export class BooksController {
   }
 
   @Post(':id/return')
-  return(@Param() { id }: FindByIdParamsDto) {
+  return(@Param() { id }: FindByIdParamsDto, @Query('userId') userId: number) {
+    if (!userId) {
+      throw new NotFoundException('User ID is required');
+    }
     return this.transactionsService.return(id, 1);
   }
 
