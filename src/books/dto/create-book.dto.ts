@@ -31,11 +31,11 @@ export class CreateBookDto {
   @ApiProperty({
     type: String,
     description: 'The ISBN of the book',
-    default: '978-3-16-148410-0',
+    default: '227551065-6',
   })
   @IsString({ message: 'ISBN must be a string' })
   @IsNotEmpty({ message: 'ISBN is required' })
-  @IsISBN(13, { message: 'Invalid ISBN' })
+  @IsISBN(10, { message: 'Invalid ISBN' })
   ISBN: string;
 
   @ApiProperty({
