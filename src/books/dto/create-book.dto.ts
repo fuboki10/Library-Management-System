@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsISBN,
   IsInt,
@@ -17,6 +17,7 @@ export class CreateBookDto {
   })
   @IsString({ message: 'Title must be a string' })
   @IsNotEmpty({ message: 'Title is required' })
+  @Expose()
   title: string;
 
   @ApiProperty({
@@ -26,6 +27,7 @@ export class CreateBookDto {
   })
   @IsString({ message: 'Author must be a string' })
   @IsNotEmpty({ message: 'Author is required' })
+  @Expose()
   author: string;
 
   @ApiProperty({
@@ -36,6 +38,7 @@ export class CreateBookDto {
   @IsString({ message: 'ISBN must be a string' })
   @IsNotEmpty({ message: 'ISBN is required' })
   @IsISBN(10, { message: 'Invalid ISBN' })
+  @Expose()
   ISBN: string;
 
   @ApiProperty({
@@ -46,6 +49,7 @@ export class CreateBookDto {
   @IsInt({ message: 'Quantity must be an integer' })
   @Min(1, { message: 'Quantity must be at least 1' })
   @Type(() => Number)
+  @Expose()
   availableQuantity: number;
 
   @ApiProperty({
@@ -58,5 +62,6 @@ export class CreateBookDto {
   @MinLength(2, {
     message: 'Shelf Location must be at least 2 characters long',
   })
+  @Expose()
   shelfLocation: string;
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -20,6 +21,7 @@ export class CreateUserDto {
   @MinLength(4, {
     message: 'Username must be at least 4 characters long',
   })
+  @Expose()
   username: string;
 
   @ApiProperty({
@@ -33,6 +35,7 @@ export class CreateUserDto {
   @MinLength(8, {
     message: 'Password must be at least 8 characters long',
   })
+  @Expose()
   password: string;
 
   @ApiProperty({
@@ -45,6 +48,7 @@ export class CreateUserDto {
   @MinLength(1, {
     message: 'Name must be at least 1 characters long',
   })
+  @Expose()
   name: string;
 
   @ApiProperty({
@@ -55,6 +59,7 @@ export class CreateUserDto {
   @IsString({ message: 'Email must be a string' })
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Invalid email address' })
+  @Expose()
   email: string;
 
   @ApiProperty({
@@ -67,5 +72,6 @@ export class CreateUserDto {
     message: 'Invalid role',
   })
   @IsOptional()
+  @Expose()
   type: string;
 }

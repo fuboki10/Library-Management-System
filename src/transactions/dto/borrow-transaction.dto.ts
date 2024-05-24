@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { IsDate, IsInt, IsOptional } from 'class-validator';
 import { IsAfter } from '../../utils/dtos';
 
@@ -12,6 +12,7 @@ export class BorrowTransactionDto {
   })
   @IsInt({ message: 'Book ID must be an integer' })
   @Type(() => Number)
+  @Expose()
   bookId: number;
 
   @ApiProperty({
@@ -22,6 +23,7 @@ export class BorrowTransactionDto {
   })
   @IsInt({ message: 'User ID must be an integer' })
   @Type(() => Number)
+  @Expose()
   userId: number;
 
   @ApiProperty({
@@ -32,6 +34,7 @@ export class BorrowTransactionDto {
   })
   @IsDate()
   @Type(() => Date)
+  @Expose()
   borrowedAt: Date;
 
   @ApiProperty({
@@ -43,6 +46,7 @@ export class BorrowTransactionDto {
   @IsDate()
   @Type(() => Date)
   @IsOptional()
+  @Expose()
   returnedAt?: Date;
 
   @ApiProperty({
@@ -54,6 +58,7 @@ export class BorrowTransactionDto {
   @IsAfter('borrowedAt')
   @IsDate()
   @Type(() => Date)
+  @Expose()
   dueDate: Date;
 }
 

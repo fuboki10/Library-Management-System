@@ -27,6 +27,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      transformOptions: { strategy: 'excludeAll' },
     }),
   );
 

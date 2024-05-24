@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
@@ -86,6 +86,7 @@ export class FindByIdParamsDto {
   })
   @IsInt()
   @Type(() => Number)
+  @Expose()
   id: number;
 }
 
@@ -100,6 +101,7 @@ export class PaginationQueryDto {
   @Min(0)
   @Type(() => Number)
   @IsOptional()
+  @Expose()
   offset: number = 0;
 
   @ApiProperty({
@@ -112,6 +114,7 @@ export class PaginationQueryDto {
   @Min(1)
   @Type(() => Number)
   @IsOptional()
+  @Expose()
   limit: number = 10;
 }
 
@@ -130,6 +133,7 @@ export class RangeDateQueryDto implements IRangedDate {
   @IsDate()
   @Type(() => Date)
   @IsOptional()
+  @Expose()
   from: Date;
 
   @ApiProperty({
@@ -141,6 +145,7 @@ export class RangeDateQueryDto implements IRangedDate {
   @IsDate()
   @Type(() => Date)
   @IsOptional()
+  @Expose()
   to: Date;
 
   @ApiProperty({
@@ -152,5 +157,6 @@ export class RangeDateQueryDto implements IRangedDate {
   @IsNotExistWith('from')
   @IsEnum(['yesterday', 'lastweek', 'lastmonth', 'lastyear'])
   @IsOptional()
+  @Expose()
   since: string;
 }

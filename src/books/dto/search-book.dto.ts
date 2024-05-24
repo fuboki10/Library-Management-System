@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
 import { CreateBookDto } from './create-book.dto';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { IsInt, IsOptional, Min } from 'class-validator';
 
 export class SearchBookDto extends PartialType(
@@ -17,6 +17,7 @@ export class SearchBookDto extends PartialType(
   @Min(0)
   @Type(() => Number)
   @IsOptional()
+  @Expose()
   offset: number = 0;
 
   @ApiProperty({
@@ -29,5 +30,6 @@ export class SearchBookDto extends PartialType(
   @Min(1)
   @Type(() => Number)
   @IsOptional()
+  @Expose()
   limit: number = 10;
 }
