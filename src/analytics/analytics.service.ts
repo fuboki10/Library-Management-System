@@ -30,9 +30,7 @@ export class AnalyticsService {
       ORDER BY borrow_count DESC
       LIMIT 10;`;
 
-    this.logger.debug(
-      `Retrieved popular books. Count: ${books.length} books, ${books[0].id}`,
-    );
+    this.logger.debug(`Retrieved popular books. Count: ${books.length} books`);
 
     return Promise.all(
       books.map(async (book) => {
@@ -67,7 +65,7 @@ export class AnalyticsService {
       LIMIT 10;`;
 
     this.logger.debug(
-      `Retrieved popular authors. Count: ${authors.length} authors, ${authors[0].author}`,
+      `Retrieved popular authors. Count: ${authors.length} authors`,
     );
 
     return authors.map((author) => ({
