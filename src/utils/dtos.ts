@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
+  Min,
   ValidateBy,
   ValidationArguments,
   ValidationOptions,
@@ -86,6 +87,32 @@ export class FindByIdParamsDto {
   @IsInt()
   @Type(() => Number)
   id: number;
+}
+
+export class PaginationQueryDto {
+  @ApiProperty({
+    name: 'offset',
+    type: Number,
+    required: false,
+    default: 0,
+  })
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  offset: number = 0;
+
+  @ApiProperty({
+    name: 'limit',
+    type: Number,
+    required: false,
+    default: 10,
+  })
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  limit: number = 10;
 }
 
 export interface IRangedDate {

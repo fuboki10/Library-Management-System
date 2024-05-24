@@ -33,8 +33,9 @@ export class BooksService {
    * @returns A Promise that resolves to an array of books matching the search criteria.
    */
   findAll(searchBookQuery: SearchBookDto) {
+    const { limit, offset, ...rest } = searchBookQuery;
     const where = mapDtoToStartsWithSearchQuery<Prisma.BookWhereInput>(
-      searchBookQuery,
+      rest,
       'insensitive',
     );
 
@@ -43,6 +44,8 @@ export class BooksService {
 
     return this.prismaService.book.findMany({
       where,
+      take: limit,
+      skip: offset,
     });
   }
 
