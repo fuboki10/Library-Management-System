@@ -61,6 +61,11 @@ borrowers in Nestjs
 
 - #### Go to `http://localhost:3000/docs` to test the API using Swagger
 
+## ER Diagram
+
+![image](https://github.com/fuboki10/Library-Management-System/assets/35429211/714e1197-9179-47f4-b415-9c8249526ea3)
+
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
