@@ -184,7 +184,7 @@ export class BooksController {
     if (!userId) {
       throw new NotFoundException('User ID is required');
     }
-    return this.transactionsService.return(id, 1);
+    return this.transactionsService.return(id, userId);
   }
 
   // ****** Helper functions ****** //
